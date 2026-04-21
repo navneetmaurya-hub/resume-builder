@@ -7,7 +7,6 @@ const generateToken = (userId) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
-
   return token;
 };
 
@@ -17,7 +16,7 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // check it required fields are present
+    // check if required fields are present
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -39,11 +38,13 @@ export const registerUser = async (req, res) => {
 
     // return success message
     const token = generateToken(newUser._id);
-    newUser.password = undefined; // hide password
+    newUser.password = undefined;
 
-    return res
-      .status(201)
-      .json({ message: "User created successfully", token, user: newUser });
+    return res.status(201).json({
+      message: "User created successfully",
+      token,
+      user: newUser,
+    });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -55,22 +56,27 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check if user already exists
+    // check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // check if password is correct
-    if (!user.comparePassword(password)) {
+    // ✅ bcrypt se password compare karo
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
     // return success message
     const token = generateToken(user._id);
-    user.password = undefined; // hide password
+    user.password = undefined;
 
-    return res.status(200).json({ message: "Login successful", token, user });
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user,
+    });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -82,15 +88,12 @@ export const getUserById = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // check if user exists
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // return user
-    user.password = undefined; // hide password
+    user.password = undefined;
     return res.status(200).json(user);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -103,9 +106,7 @@ export const getUserResumes = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // return user resumes
     const resumes = await Resume.find({ userId });
-
     return res.status(200).json({ resumes });
   } catch (error) {
     return res.status(400).json({ message: error.message });
