@@ -36,10 +36,6 @@ cd your-repo-name
 npm install
 npm start
 
-
-<img width="1826" height="862" alt="deploy" src="https://github.com/user-attachments/assets/bc0b2397-df4c-4d8e-baaf-b98dc6e4f7d4" />
-<img width="1427" height="843" alt="image" src="https://github.com/user-attachments/assets/0e55e775-6947-4cf6-933e-75fcf1084a3d" />
-
 👨‍💻 Author
 
 Navneet Maurya
